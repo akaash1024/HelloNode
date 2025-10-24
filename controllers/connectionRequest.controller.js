@@ -1,6 +1,8 @@
 const { ConnectionRequest } = require("../models/connectionRequest.model")
 const User = require("../models/user.model")
 
+const sendEmail = require("../utils/sendEmail");
+
 const sendConnectionRequest = async (req, res, next) => {
     try {
         const fromUserId = req.user._id;
@@ -22,6 +24,15 @@ const sendConnectionRequest = async (req, res, next) => {
         if (existingConnectionRequest) throw new Error(`Connection Request Already Exists!!`)
 
         const data = await ConnectionRequest.create({ fromUserId, toUserId, status })
+
+        const emailRes = await sendEmail.run(
+            "A new friend request from " + req.user.firstName,
+            req.user.firstName + " is " + status + " in " + toUser.firstName
+        );
+        
+        console.log(emailRes);
+
+
         let message = status === "interested" ? `${req.user.firstName} is instested in ${toUser.firstName}` : `${req.user.firstName} ignored ${toUser.firstName}'s profile. ..`
 
         res.status(200).json({ success: true, message, data })
@@ -34,10 +45,10 @@ const sendConnectionRequest = async (req, res, next) => {
 const reviewConnectionRequest = async (req, res, next) => {
     try {
         const loggedInUser = req.user;
-        
+
         const { requestId, status } = req.params;
         console.log(requestId, status);
-        
+
 
         const allowedStatus = ["accepted", "rejected"];
         if (!allowedStatus.includes(status)) throw new Error(`Invalid status type: ${status}`)
