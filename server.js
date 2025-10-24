@@ -25,10 +25,16 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser());
 
 // routes
-app.use("/api/auth", authRoute)
-app.use("/api/profile", profileRoute)
-app.use("/api", requestRoute)
-app.use("/api/user", userRoute)
+app.use("/auth", authRoute)
+app.use("/profile", profileRoute)
+app.use("/", requestRoute)
+app.use("/user", userRoute)
+
+// // routes
+// app.use("/api/auth", authRoute)
+// app.use("/api/profile", profileRoute)
+// app.use("/api", requestRoute)
+// app.use("/api/user", userRoute)
 
 // error handler
 app.use(errorHandler)
